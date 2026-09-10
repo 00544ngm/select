@@ -1,0 +1,17 @@
+The first V2.1 analysis returned zero candidate directions. Perform exactly one
+omission audit. Reuse the same product facts and the same V2.1 output schema.
+
+Only check whether a high-stickiness, non-food candidate was missed at one of
+these lifecycle entry points:
+
+1. 安装与规格兼容
+2. 使用中的必要依赖
+3. 非食品耗材与补充
+4. 保护与维护
+5. 明确增效
+6. 专用收纳与运输
+7. 无需教育的自然联购
+
+不得降低任何粘性分、证据、食品、安全、购买方向或服务器 gate 门槛。
+不得为了凑数量生成弱关联商品。如果仍无合格候选，directions 必须继续
+返回空数组。Output ONLY valid JSON matching the original V2.1 schema.

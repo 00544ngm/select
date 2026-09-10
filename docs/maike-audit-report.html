@@ -1,0 +1,943 @@
+<title>Maike 中转供应商技术报告</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --surface-muted: #f5f4f2;
+    --border: #e6e4dd;
+    --text: #1c1917;
+    --text-muted: #78716c;
+    --text-dim: #a8a29e;
+    --accent: #d97706;
+    --accent-bg: #fffbeb;
+    --accent-border: #fde68a;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --amber: #d97706;
+    --amber-bg: #fffbeb;
+    --slate: #475569;
+    --slate-bg: #f8fafc;
+    --code-bg: #f5f5f4;
+    --code-text: #292524;
+    --radius: 6px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1917;
+      --surface: #292524;
+      --surface-muted: #1c1917;
+      --border: #44403c;
+      --text: #fafaf9;
+      --text-muted: #a8a29e;
+      --text-dim: #78716c;
+      --accent: #f59e0b;
+      --accent-bg: #292524;
+      --accent-border: #78350f;
+      --green: #22c55e;
+      --green-bg: #1a2e1a;
+      --red: #ef4444;
+      --red-bg: #2e1a1a;
+      --amber: #f59e0b;
+      --amber-bg: #29241a;
+      --slate: #94a3b8;
+      --slate-bg: #1e293b;
+      --code-bg: #292524;
+      --code-text: #e7e5e4;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1c1917;
+    --surface: #292524;
+    --surface-muted: #1c1917;
+    --border: #44403c;
+    --text: #fafaf9;
+    --text-muted: #a8a29e;
+    --text-dim: #78716c;
+    --accent: #f59e0b;
+    --accent-bg: #292524;
+    --accent-border: #78350f;
+    --green: #22c55e;
+    --green-bg: #1a2e1a;
+    --red: #ef4444;
+    --red-bg: #2e1a1a;
+    --amber: #f59e0b;
+    --amber-bg: #29241a;
+    --slate: #94a3b8;
+    --slate-bg: #1e293b;
+    --code-bg: #292524;
+    --code-text: #e7e5e4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .header-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+  }
+
+  .stat-card .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .stat-card .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-card .stat-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-value.slate { color: var(--slate); }
+
+  /* Section */
+  .section {
+    margin-bottom: 40px;
+  }
+
+  .section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    margin-top: 24px;
+  }
+
+  .section p {
+    margin-bottom: 12px;
+    max-width: 72ch;
+    color: var(--text);
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  th {
+    background: var(--surface-muted);
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    line-height: 1;
+  }
+
+  .badge-ok { background: var(--green-bg); color: var(--green); }
+  .badge-fail { background: var(--red-bg); color: var(--red); }
+  .badge-warn { background: var(--amber-bg); color: var(--amber); }
+  .badge-info { background: var(--slate-bg); color: var(--slate); }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .dot-ok { background: var(--green); }
+  .dot-fail { background: var(--red); }
+  .dot-warn { background: var(--amber); }
+
+  /* Code */
+  code {
+    font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    white-space: pre;
+    color: var(--code-text);
+  }
+
+  /* Callout */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-bg);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+  }
+
+  .callout strong { color: var(--accent); }
+
+  .callout-red {
+    border-left-color: var(--red);
+    background: var(--red-bg);
+  }
+  .callout-red strong { color: var(--red); }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 20px;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-entry {
+    position: relative;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .tl-entry::before {
+    content: "";
+    position: absolute;
+    left: -21px;
+    top: 6px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .tl-entry.fail::before { background: var(--red); }
+  .tl-entry.ok::before { background: var(--green); }
+
+  .tl-date {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .tl-title {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .tl-desc {
+    color: var(--text-muted);
+    font-size: 12.5px;
+  }
+
+  /* Flow */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+    font-size: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+
+  .flow-node {
+    background: var(--code-bg);
+    padding: 6px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    color: var(--code-text);
+    font-weight: 600;
+  }
+
+  .flow-arrow {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .flow-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+
+  /* Summary grid */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .page { padding: 24px 16px 48px; }
+    .header h1 { font-size: 22px; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+
+  .card h4 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .card .kv {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    font-size: 13px;
+    border-bottom: 1px dotted var(--border);
+  }
+
+  .card .kv:last-child { border-bottom: none; }
+
+  .kv-key { color: var(--text-muted); }
+  .kv-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .proto-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+</style>
+
+<div class="page">
+
+  <header class="header">
+    <div class="header-label">System Audit</div>
+    <h1>Maike 中转供应商技术报告</h1>
+    <div class="header-meta">
+      <span>生成时间：2026-09-07 14:40 UTC</span>
+      <span>Git 分支：codex/stickiness-scoring-v2-1</span>
+      <span>修订：b4c99c5</span>
+    </div>
+  </header>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="stat-card">
+      <div class="stat-label">供应商槽位</div>
+      <div class="stat-value slate">2</div>
+      <div class="stat-sub">custom + claude</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">已勾选模型</div>
+      <div class="stat-value green">5</div>
+      <div class="stat-sub">4 custom + 1 claude</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">历史任务</div>
+      <div class="stat-value amber">26</div>
+      <div class="stat-sub">11 完成 / 15 失败 (58% 失败率)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">当前协议</div>
+      <div class="stat-value" style="color: var(--slate);">chat_completions</div>
+      <div class="stat-sub">json_schema (strict)</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Architecture -->
+  <div class="section">
+    <h2>1. 系统架构</h2>
+
+    <h3>1.1 两个 Maike 槽位</h3>
+    <p>系统中有两个独立的供应商配置槽位，均指向同一中转站 <code>maike-ai.top</code>，但使用不同协议和端点：</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>custom · OpenAI 兼容</h4>
+        <div class="kv"><span class="kv-key">显示名称</span><span class="kv-val">maike</span></div>
+        <div class="kv"><span class="kv-key">服务地址</span><span class="kv-val" style="font-size:12px; font-family:monospace;">maike-ai.top/v1</span></div>
+        <div class="kv"><span class="kv-key">协议</span><span class="kv-val">openai</span></div>
+        <div class="kv"><span class="kv-key">默认模型</span><span class="kv-val">gpt-5.6</span></div>
+        <div class="kv"><span class="kv-key">目录模型</span><span class="kv-val">17 个</span></div>
+        <div class="kv"><span class="kv-key">连接状态</span><span class="kv-val"><span class="badge badge-warn">success (降级)</span></span></div>
+        <div class="kv"><span class="kv-key">validation_revision</span><span class="kv-val">1</span></div>
+      </div>
+      <div class="card">
+        <h4>claude · Anthropic 兼容</h4>
+        <div class="kv"><span class="kv-key">显示名称</span><span class="kv-val">Claude</span></div>
+        <div class="kv"><span class="kv-key">服务地址</span><span class="kv-val" style="font-size:12px; font-family:monospace;">maike-ai.top</span></div>
+        <div class="kv"><span class="kv-key">协议</span><span class="kv-val">anthropic</span></div>
+        <div class="kv"><span class="kv-key">默认模型</span><span class="kv-val">claude-opus-5</span></div>
+        <div class="kv"><span class="kv-key">目录模型</span><span class="kv-val">1 个</span></div>
+        <div class="kv"><span class="kv-key">连接状态</span><span class="kv-val"><span class="badge badge-ok">success</span></span></div>
+        <div class="kv"><span class="kv-key">validation_revision</span><span class="kv-val">1</span></div>
+      </div>
+    </div>
+
+    <div class="callout" style="font-size:12px;">
+      <strong>注意：</strong>两个槽位使用同一 API Key（加密存储于 <code>provider_configurations.encrypted_api_key</code>，Fernet 加密，密钥文件 <code>backend/.api-config.key</code>）。custom 的连接测试返回「连接成功，发现 17 个模型，默认模型 gpt-5.6 当前不可用（PROVIDER_UPSTREAM_UNAVAILABLE）」，但短结构化探针可验证成功，属上游间歇性。
+    </div>
+
+    <h3>1.2 请求链路</h3>
+    <div class="flow">
+      <span class="flow-label">前端</span>
+      <span class="flow-node">Workbench</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">POST /api/v1/jobs</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">ARQ Worker</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">ProviderClientResolver</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">OpenAILLMClient</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">AsyncOpenAI<br><span style="font-size:10px">base_url=maike-ai.top/v1</span></span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">Maike<br>上游 GPT/Claude</span>
+    </div>
+
+    <p>对于 <code>custom</code> 槽位，<code>ProviderClientResolver.resolve_primary()</code> 从数据库读取已验证的 <code>transport_mode</code> 和 <code>structured_output_mode</code>，注入 <code>OpenAILLMClient</code> 构造参数。对于 <code>claude</code> 槽位，走 <code>AnthropicLLMClient</code>（原生 Messages API）。</p>
+  </div>
+
+  <!-- Section 2: Model Validation -->
+  <div class="section">
+    <h2>2. 模型验证状态</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>槽位</th>
+            <th>协议</th>
+            <th>模型</th>
+            <th>验证状态</th>
+            <th>勾选</th>
+            <th>Transport</th>
+            <th>Structured Output</th>
+            <th>使用次数</th>
+            <th>最后验证</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>gpt-5.6-terra</code></td>
+            <td><span class="badge badge-ok">verified</span></td>
+            <td><span class="badge badge-ok">✓</span></td>
+            <td>chat_completions</td>
+            <td>json_schema</td>
+            <td>13</td>
+            <td>2026-09-07 14:20</td>
+          </tr>
+          <tr>
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>gpt-5.6-sol</code></td>
+            <td><span class="badge badge-ok">verified</span></td>
+            <td><span class="badge badge-ok">✓</span></td>
+            <td>chat_completions</td>
+            <td>json_schema</td>
+            <td>2</td>
+            <td>2026-09-07 07:13</td>
+          </tr>
+          <tr>
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>gpt-5.5</code></td>
+            <td><span class="badge badge-ok">verified</span></td>
+            <td><span class="badge badge-ok">✓</span></td>
+            <td>chat_completions</td>
+            <td>json_schema</td>
+            <td>2</td>
+            <td>2026-09-06 09:53</td>
+          </tr>
+          <tr>
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>claude-haiku-4-5-20251001</code></td>
+            <td><span class="badge badge-ok">verified</span></td>
+            <td><span class="badge badge-ok">✓</span></td>
+            <td>chat_completions</td>
+            <td>json_schema</td>
+            <td>0</td>
+            <td>2026-08-14 18:06</td>
+          </tr>
+          <tr style="background: var(--surface-muted)">
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>gpt-5.6</code> (裸)</td>
+            <td><span class="badge badge-ok">verified</span></td>
+            <td><span class="badge badge-fail">✗</span></td>
+            <td>chat_completions</td>
+            <td>json_schema</td>
+            <td>0</td>
+            <td>2026-09-07 06:32</td>
+          </tr>
+          <tr style="background: var(--surface-muted)">
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>gpt-5.6-luna</code></td>
+            <td><span class="badge badge-warn">temp_error</span></td>
+            <td><span class="badge badge-fail">✗</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td>0</td>
+            <td>2026-08-15 04:46</td>
+          </tr>
+          <tr style="background: var(--surface-muted)">
+            <td>custom</td>
+            <td>openai</td>
+            <td><code>claude-opus-4-8</code></td>
+            <td><span class="badge badge-warn">temp_error</span></td>
+            <td><span class="badge badge-fail">✗</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td>0</td>
+            <td>2026-09-02 06:50</td>
+          </tr>
+          <tr>
+            <td>claude</td>
+            <td>anthropic</td>
+            <td><code>claude-opus-5</code></td>
+            <td><span class="badge badge-ok">verified</span></td>
+            <td><span class="badge badge-ok">✓</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td>9</td>
+            <td>2026-09-06 09:53</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>灰色行表示已验证但未勾选，或验证失败。前端工作台只展示 <code>is_selected = true</code> 的模型，因此实际可选模型为 4 个 custom + 1 个 claude。</p>
+
+    <div class="callout">
+      <strong>关键发现：</strong>裸 <code>gpt-5.6</code>（无后缀）虽然短探针验证成功，但数据库里 <code>is_selected = false</code>，且 <code>default_model</code> 字段仍指向它。如果任务请求不显式携带 model，会回退到这个裸 <code>gpt-5.6</code>——但最终仍会被 <code>resolve_primary</code> 中的 <code>is_selected</code> 检查拦截（代码路径：<code>provider_clients.py:625-640</code>）。
+    </div>
+
+    <h3>2.1 模型验证流程</h3>
+    <p><code>ProviderModelVerifier._verify_custom_openai()</code> 对每个模型依次探测三种结构化模式：</p>
+    <div class="code-block">json_schema → json_object → prompt_json → (兜底) responses + prompt_json</div>
+    <p>当前所有已验证的 custom 模型均命中第一档 <code>json_schema</code>（strict mode），因此 <code>transport_mode = chat_completions</code>、<code>structured_output_mode = json_schema</code>。从未落入 <code>responses</code> 兜底路径。</p>
+  </div>
+
+  <!-- Section 3: Job History -->
+  <div class="section">
+    <h2>3. 任务执行历史</h2>
+
+    <h3>3.1 总体统计</h3>
+    <div class="grid-2">
+      <div class="card">
+        <h4>按状态</h4>
+        <div class="kv"><span class="kv-key">完成</span><span class="kv-val" style="color: var(--green);">11</span></div>
+        <div class="kv"><span class="kv-key">失败</span><span class="kv-val" style="color: var(--red);">15</span></div>
+        <div class="kv"><span class="kv-key">成功率</span><span class="kv-val" style="color: var(--amber);">42.3%</span></div>
+      </div>
+      <div class="card">
+        <h4>按模型 (近30次attempt)</h4>
+        <div class="kv"><span class="kv-key">gpt-5.6-terra</span><span class="kv-val">17 次 (5 成功)</span></div>
+        <div class="kv"><span class="kv-key">gpt-5.6-sol</span><span class="kv-val">5 次 (2 成功)</span></div>
+        <div class="kv"><span class="kv-key">gpt-5.5</span><span class="kv-val">4 次 (0 成功)</span></div>
+        <div class="kv"><span class="kv-key">claude-opus-5</span><span class="kv-val">4 次 (2 成功)</span></div>
+      </div>
+    </div>
+
+    <h3>3.2 失败模式分布</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>错误码</th><th>出现次数</th><th>典型耗时</th><th>阶段</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>MODEL_UPSTREAM_UNAVAILABLE</code></td><td>12</td><td>181s &ndash; 428s</td><td>run_hypothesis</td></tr>
+          <tr><td><code>MODEL_TIMEOUT</code></td><td>3</td><td>252s &ndash; 409s</td><td>run_hypothesis</td></tr>
+          <tr><td><code>PROVIDER_STRUCTURED_OUTPUT_UNSUPPORTED</code></td><td>3</td><td>8s &ndash; 161s</td><td>run_hypothesis / run_judgment</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.3 关键事件时间线</h3>
+    <div class="timeline">
+      <div class="tl-entry ok">
+        <div class="tl-date">2026-09-07 14:20</div>
+        <div class="tl-title">Maike /v1/responses 端点探针测试</div>
+        <div class="tl-desc">简单请求 4 个模型全部秒回。结构化 responses 探针：gpt-5.6 (4.7s OK)、gpt-5.5 (13.8s OK)、但 gpt-5.6-sol/terra 35s 挂起。判定 responses 端点可用但不稳定，上游间歇性。</div>
+      </div>
+      <div class="tl-entry fail">
+        <div class="tl-date">2026-09-07 14:15</div>
+        <div class="tl-title">gpt-5.6-terra 再次失败</div>
+        <div class="tl-desc">两轮 attempt 均 MODEL_UPSTREAM_UNAVAILABLE (181s + 239s)。DeepSeek 副腿正常生成方向。</div>
+      </div>
+      <div class="tl-entry fail">
+        <div class="tl-date">2026-09-07 07:05–07:39</div>
+        <div class="tl-title">gpt-5.6-sol 失败 (428s)、gpt-5.6-terra 失败 (280s) 后成功 (377s)</div>
+        <div class="tl-desc">terra 第二次 attempt 在 377s 完成，生成 4 个方向。sol 单次 428s 上游断开。</div>
+      </div>
+      <div class="tl-entry ok">
+        <div class="tl-date">2026-09-07 06:32</div>
+        <div class="tl-title">裸 gpt-5.6 短探针验证通过</div>
+        <div class="tl-desc">结构化验证成功，但未勾选（is_selected=false）。</div>
+      </div>
+      <div class="tl-entry fail">
+        <div class="tl-date">2026-09-06 全天</div>
+        <div class="tl-title">I-211 ~ I-213：系统性诊断 Maike 失败根因</div>
+        <div class="tl-desc">确认瓶颈在上游对重型长生成请求的通道容量/稳定性，非协议、非 schema 形态、非本软件超时。</div>
+      </div>
+      <div class="tl-entry ok">
+        <div class="tl-date">2026-08-15–16</div>
+        <div class="tl-title">间歇性成功窗口</div>
+        <div class="tl-desc">gpt-5.6-terra 连续完成 (100s, 198s, 287s)，claude-opus-5 也完成 (238s, 270s)。</div>
+      </div>
+      <div class="tl-entry fail">
+        <div class="tl-date">2026-08-14</div>
+        <div class="tl-title">I-210：第三方 OpenAI 兼容发布 (0.1.14)</div>
+        <div class="tl-desc">彻底修复了 custom GPT-5.x 按模型名强制走 Responses 的 bug。改为探测 Chat json_schema → json_object → prompt_json → Responses 兜底。能力与连接修订号绑定。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Responses API Experiment -->
+  <div class="section">
+    <h2>4. Responses API 兼容性实验</h2>
+
+    <p>2026-09-07 对 Maike 的 <code>/v1/responses</code> 端点进行了受控探针测试，验证「最新 OpenAI Responses 协议」的可用性。实验未修改任何代码或数据库，仅使用解密后的 API Key 发送只读短探针。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>测试</th><th>模型</th><th>结果</th><th>耗时</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>简单文本</td><td>gpt-5.6, sol, terra, 5.5</td><td><span class="badge badge-ok">全部 OK</span></td><td>&lt; 3s</td><td>"Reply OK" → "OK"</td></tr>
+          <tr><td>结构化 (有界 35s)</td><td>gpt-5.6</td><td><span class="badge badge-ok">OK</span></td><td>4.7s</td><td></td></tr>
+          <tr><td>结构化 (有界 35s)</td><td>gpt-5.5</td><td><span class="badge badge-ok">OK</span></td><td>13.8s</td><td></td></tr>
+          <tr><td>结构化 (有界 35s)</td><td>gpt-5.6-sol</td><td><span class="badge badge-fail">挂起</span></td><td>&gt; 35s</td><td>第一次 10.7s 成功，第二次 35s 挂起</td></tr>
+          <tr><td>结构化 (有界 35s)</td><td>gpt-5.6-terra</td><td><span class="badge badge-fail">挂起</span></td><td>&gt; 35s</td><td></td></tr>
+          <tr><td>结构化 (对照)</td><td>gpt-5.6-sol (chat)</td><td><span class="badge badge-ok">OK</span></td><td>3.0s</td><td>chat_completions + json_schema</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-red">
+      <strong>结论：</strong>Responses API 端点本身可通，但 <strong>间歇性不可靠</strong>。同一模型 gpt-5.6-sol 两次测 results 不一样（一次 10.7s 成功，一次 35s 挂起），完美复现了历史记录中反复记载的「Maike 上游间歇性」。当前 chat_completions 协议反而更稳定，因此无需切换。
+    </div>
+  </div>
+
+  <!-- Section 5: Timeout Strategy -->
+  <div class="section">
+    <h2>5. 超时与重试策略</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>层级</th><th>作用范围</th><th>上限</th><th>来源</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>单请求</td><td>所有 gpt-5.5 / gpt-5.6</td><td>600s</td><td><code>_SLOW_STRUCTURED_REPORT_MODELS</code></td></tr>
+          <tr><td>单请求</td><td>其他模型</td><td>120s</td><td><code>_DEFAULT_STRUCTURED_REPORT_TIMEOUT_SECONDS</code></td></tr>
+          <tr><td>任务</td><td>custom + gpt-*</td><td>1000s</td><td><code>_resolve_job_deadline()</code> (I-211)</td></tr>
+          <tr><td>任务</td><td>其他 provider</td><td>600s</td><td><code>_resolve_job_deadline()</code></td></tr>
+          <tr><td>ARQ 外层</td><td>所有任务</td><td>1200s</td><td><code>WorkerSettings.job_timeout</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>重试机制：每个模型最多 2 次受控重试（<code>max_retries=1</code>，即 1 次初始 + 1 次重试）。模型轮换：启用时按前端配置的顺序依次尝试，每个模型最多一次。</p>
+
+    <div class="callout">
+      <strong>设计决策：</strong>I-211 将 Maike GPT 通道的任务级上限从 600s 放宽到 1000s，ARQ 外层兜底从 600s 提到 1200s。I-212 将 gpt-5.6 家族并入慢速报告名单（单请求 600s）。两项改动后，代码侧已给 Maike 通道最大合理预算，剩余失败属上游容量/稳定性问题，非本软件可调。
+    </div>
+  </div>
+
+  <!-- Section 6: Known Issues -->
+  <div class="section">
+    <h2>6. 已知问题与限制</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>编号</th><th>问题</th><th>严重程度</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>F-352</td>
+            <td>Maike Claude 完整报告连续产生无效/未闭合 JSON</td>
+            <td><span class="badge badge-fail">高</span></td>
+            <td>已禁止 claude 槽位用于正式报告</td>
+          </tr>
+          <tr>
+            <td>I-213</td>
+            <td>Schema 形态（json_object vs json_schema）非 Maike 失败瓶颈</td>
+            <td><span class="badge badge-info">信息</span></td>
+            <td>已证实，无需 schema 严格化大工程</td>
+          </tr>
+          <tr>
+            <td>&mdash;</td>
+            <td>Maike 上游对重型长生成请求间歇性拒绝（~4 分钟 5xx/断开）</td>
+            <td><span class="badge badge-fail">高</span></td>
+            <td>上游问题，非本软件可控</td>
+          </tr>
+          <tr>
+            <td>&mdash;</td>
+            <td>裸 gpt-5.6 为 default_model 但 is_selected=false</td>
+            <td><span class="badge badge-warn">中</span></td>
+            <td>不显式带 model 的任务会被拦截</td>
+          </tr>
+          <tr>
+            <td>&mdash;</td>
+            <td>custom 连接测试显示默认模型不可用 (PROVIDER_UPSTREAM_UNAVAILABLE)</td>
+            <td><span class="badge badge-warn">中</span></td>
+            <td>降级后仍可连接，但新用户困惑</td>
+          </tr>
+          <tr>
+            <td>&mdash;</td>
+            <td>Maike 超时放宽依赖 provider slug 'custom' + 模型前缀 'gpt-'</td>
+            <td><span class="badge badge-warn">低</span></td>
+            <td>slot 改名或出现其他 custom 会误命中/漏命中</td>
+          </tr>
+          <tr>
+            <td>&mdash;</td>
+            <td>Responses API 结构化请求间歇性挂起</td>
+            <td><span class="badge badge-warn">中</span></td>
+            <td>当前走 chat_completions 不受影响</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 7: Recommendations -->
+  <div class="section">
+    <h2>7. 建议与后续方向</h2>
+
+    <h3>7.1 当前状态评估</h3>
+    <p>Maike 中转供应商在 <strong>短结构化探针</strong> 层面完全可用（4 个 gpt 模型 + 1 个 claude haiku 均 verified）。但在 <strong>完整报告</strong> 层面成功率仅 ~42%，且失败模式高度一致：上游在 4&ndash;5 分钟后断开（<code>MODEL_UPSTREAM_UNAVAILABLE</code>）。代码侧可调杠杆已用尽：单请求 600s、任务 1000s、ARQ 外层 1200s。</p>
+
+    <h3>7.2 短期建议</h3>
+    <ol>
+      <li><strong>保持当前协议不变</strong>（<code>chat_completions + json_schema</code>）。Responses API 虽然在端点层面可用，但间歇性更严重，切换无收益。</li>
+      <li><strong>考虑将 <code>default_model</code> 从裸 <code>gpt-5.6</code> 改为 <code>gpt-5.6-terra</code></strong>（当前使用最多、成功率最高的模型）。避免新任务不带 model 时被拦截。</li>
+      <li><strong>保持模型轮换开启</strong>。当前 terra → sol → 5.5 → haiku 的轮换顺序合理，失败时自动切换。</li>
+      <li><strong>Maike 作为辅助通道</strong>，正式报告优先使用 OpenAI 官方或 DeepSeek。Maike 仅在轮换时作为备选。</li>
+    </ol>
+
+    <h3>7.3 长期方向</h3>
+    <ol>
+      <li><strong>请求瘦身</strong>：缩小 HypothesisOutput schema 尺寸（I-212 所述 A 方向），虽然 I-213 证明 schema 形态不是瓶颈，但减小输出 token 量可能降低上游断开概率。</li>
+      <li><strong>供应商侧确认</strong>：Maike 若确为「长生成/大输出」上游限制，需联系供应商确认生成 token 上限、时长上限或渠道负载策略。</li>
+      <li><strong>分流策略</strong>：短验证走 Maike（低成本），长报告走 OpenAI 官方（稳定）。</li>
+    </ol>
+  </div>
+
+  <!-- Section 8: Code References -->
+  <div class="section">
+    <h2>8. 关键代码路径</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>文件</th><th>关键函数/类</th><th>职责</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>app/infrastructure/llm/__init__.py</code></td><td>OpenAILLMClient</td><td>GPT 客户端，支持 chat_completions 和 responses 两种 transport</td></tr>
+          <tr><td><code>app/infrastructure/llm/openai_compat.py</code></td><td>classify_openai_compatible_error</td><td>错误分类（区分 400/401/404/429/5xx）</td></tr>
+          <tr><td><code>app/infrastructure/llm/anthropic_client.py</code></td><td>AnthropicLLMClient</td><td>Anthropic Messages API 客户端（claude 槽位）</td></tr>
+          <tr><td><code>backend/application/provider_clients.py</code></td><td>ProviderClientResolver</td><td>供应商客户端解析，路由到正确的 LLM Client</td></tr>
+          <tr><td><code>backend/application/provider_clients.py</code></td><td>ProviderModelVerifier</td><td>模型验证：探测 json_schema → json_object → prompt_json → responses</td></tr>
+          <tr><td><code>backend/application/provider_clients.py</code></td><td>ProviderConnectionTester</td><td>连接测试：模型目录发现 + 短请求验证</td></tr>
+          <tr><td><code>backend/workers/jobs.py</code></td><td>_resolve_job_deadline</td><td>Maike GPT 专属 1000s 任务上限</td></tr>
+          <tr><td><code>backend/db/models.py</code></td><td>ProviderConfiguration</td><td>供应商配置 ORM 模型</td></tr>
+          <tr><td><code>backend/db/models.py</code></td><td>ProviderModelValidation</td><td>模型验证记录 ORM（含 transport_mode / structured_output_mode）</td></tr>
+          <tr><td><code>backend/security/provider_crypto.py</code></td><td>ProviderCrypto</td><td>Fernet 加密/解密 API Key</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 9: Data -->
+  <div class="section">
+    <h2>9. 附录：数据库快照</h2>
+
+    <h3>9.1 供应商配置 (provider_configurations)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>slug</th><th>type</th><th>protocol</th><th>name</th><th>base_url</th><th>default_model</th><th>enabled</th><th>test</th><th>models</th><th>rev</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>custom</td><td>openai_compatible</td><td>openai</td><td>maike</td><td style="font-size:11px;font-family:monospace;">maike-ai.top/v1</td><td>gpt-5.6</td><td><span class="badge badge-ok">✓</span></td><td>success*</td><td>17</td><td>1</td></tr>
+          <tr><td>claude</td><td>anthropic</td><td>anthropic</td><td>Claude</td><td style="font-size:11px;font-family:monospace;">maike-ai.top</td><td>claude-opus-5</td><td><span class="badge badge-ok">✓</span></td><td>success</td><td>1</td><td>1</td></tr>
+          <tr><td>openai</td><td>openai</td><td>openai</td><td>OpenAI</td><td style="font-size:11px;font-family:monospace;">api.openai.com/v1</td><td>gpt-4o</td><td><span class="badge badge-ok">✓</span></td><td>success</td><td>89</td><td>2</td></tr>
+          <tr><td>deepseek</td><td>openai_compatible</td><td>openai</td><td>DeepSeek</td><td style="font-size:11px;font-family:monospace;">api.deepseek.com</td><td>deepseek-v4-flash</td><td><span class="badge badge-ok">✓</span></td><td>success</td><td>2</td><td>2</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>9.2 custom 完整模型目录 (17 个)</h3>
+    <div class="code-block">claude-haiku-4-5-20251001
+claude-opus-4-7
+claude-opus-4-8
+claude-sonnet-4-6
+codex-auto-review
+gpt-5.2
+gpt-5.3-codex-spark
+gpt-5.4
+gpt-5.4-mini
+gpt-5.5
+gpt-5.5-openai-compact
+gpt-5.6
+gpt-5.6-sol
+gpt-5.6-sol-openai-compact
+gpt-5.6-terra
+gpt-6-astra
+gpt-reserve</div>
+
+    <p style="font-size:11px; color: var(--text-dim);">* custom 连接测试返回「连接成功，发现 17 个模型；默认模型 gpt-5.6 当前不可用（PROVIDER_UPSTREAM_UNAVAILABLE）」，属降级成功。</p>
+  </div>
+
+</div>

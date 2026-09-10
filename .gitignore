@@ -1,0 +1,28 @@
+.env
+.env.local
+.env.*.local
+.venv/
+__pycache__/
+*.pyc
+.chrome-profile*/
+output/
+logs/
+.pytest_cache/
+.pytest-tmp/
+.ruff_cache/
+.mypy_cache/
+
+# Next.js / Node.js
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+test-results/
+
+# Local tooling
+.chrome-screenshot/
+.worktrees/
+.superpowers/
+backend/.api-config.key

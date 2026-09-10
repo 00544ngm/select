@@ -1,0 +1,149 @@
+【沃尔玛跨境·组合选品 指令B：假设审判器 v9】
+
+【任务】我已按指令A的方向找到真实B品，现在做二次验证。用真实数据重新过堂每一条假设，该杀就杀。
+
+A品数据：{product_a_data}
+B品数据：{product_b_data}
+原假设：{original_hypotheses}
+
+【铁律】（同指令A，另加）
+5. 审判纪律：真实数据与原假设冲突时，以真实数据为准，原假设作废重写
+6. 底价保守判定：底价为区间时一律按区间上限判定
+7. 【语言要求】所有分析内容（alignment_review、motivation_review、price_calculation、veto_check、delivery_package 等字段的内容）必须用中文输出。B品名称保持原文。
+
+【六关审判】
+
+1. 假设对齐审查（Alignment Review）
+   逐项核对B品真身：规格是否匹配、价格带是否对齐、功能是否互补、形态尺寸是否合理
+
+2. 动机复核（Motivation Review）
+   原假设的归型是否仍成立？B品Listing体检：主图、标题、卖点是否暗示可搭配A品使用
+
+3. 价格数学实算（Price Calculation）
+   用实价重算：A品售价 + B品售价 vs 组合预期定价；1688成本 vs Walmart售价；毛利空间
+
+3.5 用户理性审查（User Rationality Check）
+   评估原假设中"用户理性"论证的逻辑严谨性：B品真实数据是否支撑该逻辑、
+   推理链是否完整、有无逻辑跳跃或假设不成立的情况。
+   为每个B品输出用户理性评分（0-100）和分析文字。
+
+4. 一票否决（Veto Check）
+   G1: A品是耗材类/B品是耐用品 或反之 → 节奏不匹配
+   G2: B是A的竞品（功能重叠、同一场景替代关系）
+   G3: B的评论有大量A品互补需求（已被验证）
+   G4: B的品牌力显著高于A（喧宾夺主）
+   G5: B的体积/重量导致物流成本不成比例
+   G6: B有法律风险（侵权/认证/合规）
+   G7: B的差评率>20%或核心功能差评集中
+
+5. 双评分（C-Score + B-Score）
+   C组合价值分(0-100)：按互补强度、客单价提升、场景增值、差评覆盖打分
+   B跨境执行分(0-100)：按1688供给成熟度、物流友好、认证门槛、旺季窗口打分
+
+6. 判级与排序
+   S: 双高（强烈推荐，可马上推进）
+   A: 一高一中（推荐，需关注短板）
+   B: 双中或一高一低（可行但需条件）
+   C: 任一评分为低或触发否决（不推荐）
+
+==========
+输出必须是严格的 JSON 格式，按以下 schema，不要添加任何额外说明文字：
+
+{
+  "alignment_review": [
+    {
+      "product_b": "B品名称",
+      "original_hypothesis": "原假设方向",
+      "spec_match": "规格匹配情况",
+      "price_alignment": "价格对齐分析",
+      "function_complement": "功能互补评估",
+      "size_fit": "形态尺寸适配",
+      "overall_verdict": "alignment / partial_mismatch / mismatch"
+    }
+  ],
+  "motivation_review": {
+    "per_b_product": {
+      "B品名称": {
+        "original_type": "原假设归型",
+        "type_still_valid": true,
+        "revised_type": "如不成立，新归型",
+        "listing_signals": "Listing中体现的搭配信号",
+        "motivation_strength": "strong / moderate / weak"
+      }
+    }
+  },
+  "price_calculation": {
+    "per_b_product": {
+      "B品名称": {
+        "a_price": 0,
+        "b_price": 0,
+        "combined_price": 0,
+        "suggested_bundle_price": 0,
+        "b_1688_cost": "预估成本",
+        "estimated_margin": "预估毛利",
+        "margin_assessment": "healthy / tight / negative"
+      }
+    }
+  },
+  "veto_check": {
+    "per_b_product": {
+      "B品名称": {
+        "g1_rhythm": false,
+        "g2_competition": false,
+        "g3_validated": false,
+        "g4_brand_overshadow": false,
+        "g5_logistics": false,
+        "g6_legal": false,
+        "g7_bad_reviews": false,
+        "vetoed": false,
+        "veto_reason": ""
+      }
+    }
+  },
+  "c_score": {
+    "per_b_product": {
+      "B品名称": {
+        "complementarity": 0,
+        "ticket_lift": 0,
+        "scenario_value": 0,
+        "pain_point_coverage": 0,
+        "total": 0
+      }
+    }
+  },
+  "b_score": {
+    "per_b_product": {
+      "B品名称": {
+        "supply_maturity": 0,
+        "logistics_friendliness": 0,
+        "certification_barrier": 0,
+        "season_window": 0,
+        "total": 0
+      }
+    }
+  },
+  "user_rationality": {
+    "per_b_product": {
+      "B品名称": {
+        "score": 0,
+        "analysis": "用户理性分析评估",
+        "logical_gaps": "逻辑缺口或改进建议"
+      }
+    }
+  },
+  "final_grade": "S | A | B | C",
+  "delivery_package": {
+    "per_b_product": {
+      "B品名称": {
+        "recommended_bundle_type": "物理捆绑 / 促销组合 / 引导跳转",
+        "pricing_tactic": "定价策略",
+        "listing_collateral": "Listing联动方案",
+        "launch_priority": 1,
+        "next_steps": ["行动项1", "行动项2"]
+      }
+    }
+  },
+  "priority_score": 0.0,
+  "product_title_zh": "主品标题的中文翻译"
+}
+==========

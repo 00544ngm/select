@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 145 13% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 145 13% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 145 13% 18%;
+    --primary: 148 52% 28%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 135 10% 89%;
+    --secondary-foreground: 145 16% 24%;
+    --muted: 135 9% 91%;
+    --muted-foreground: 145 7% 42%;
+    --accent: 140 13% 86%;
+    --accent-foreground: 148 48% 24%;
+    --destructive: 9 63% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 148 45% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 39 73% 48%;
+    --warning-foreground: 145 13% 16%;
+    --border: 140 9% 82%;
+    --input: 140 9% 79%;
+    --ring: 148 52% 28%;
+    --canvas: 140 9% 94%;
+    --navigation: 148 15% 14%;
+    --navigation-foreground: 135 13% 88%;
+    --radius: 6px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-canvas text-foreground;
+    font-family: "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 1.6;
+    font-feature-settings: "tnum";
+  }
+}
+
+@layer components {
+  .analysis-copy {
+    line-height: 1.7;
+  }
+
+  .keyword-text {
+    font-family: Consolas, "SFMono-Regular", monospace;
+    font-size: 13px;
+  }
+}

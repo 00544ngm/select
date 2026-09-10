@@ -1,0 +1,41 @@
+
+> bundling-frontend@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.20
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.110:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.2s
+ ○ Compiling /jobs/[jobId] ...
+ ✓ Compiled /jobs/[jobId] in 2.6s (970 modules)
+ GET /jobs/21c6b3ce-b54c-40a4-8a92-4e0a94dca074 200 in 1497ms
+ GET / 200 in 3365ms
+ GET /jobs/21c6b3ce-b54c-40a4-8a92-4e0a94dca074 200 in 834ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 66ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 67ms
+ GET / 200 in 26ms
+ ○ Compiling /history ...
+ ✓ Compiled /history in 2.4s (1007 modules)
+ GET /history 200 in 2650ms
+ GET /history 200 in 393ms
+ ✓ Compiled in 660ms (440 modules)
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 656ms
+ GET / 200 in 661ms
+ GET /jobs/21c6b3ce-b54c-40a4-8a92-4e0a94dca074 200 in 657ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 71ms
+ GET /jobs/21c6b3ce-b54c-40a4-8a92-4e0a94dca074 200 in 71ms
+ GET / 200 in 69ms
+ GET /history 200 in 45ms
+ GET /jobs/21c6b3ce-b54c-40a4-8a92-4e0a94dca074 200 in 85ms
+ GET /history 200 in 23ms
+ ✓ Compiled /settings/api in 407ms (1017 modules)
+ GET /settings/api 200 in 520ms
+ GET /history 200 in 27ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 202ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 78ms
+ ✓ Compiled in 541ms (968 modules)
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 152ms
+ GET /jobs/21c6b3ce-b54c-40a4-8a92-4e0a94dca074 200 in 154ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 155ms

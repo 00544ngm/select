@@ -1,0 +1,28 @@
+
+> bundling-frontend@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.20
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.110:3000
+
+ ✓ Starting...
+ ✓ Ready in 3s
+ ○ Compiling /jobs/[jobId] ...
+ ✓ Compiled /jobs/[jobId] in 1445ms (869 modules)
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 2734ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 72ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 66ms
+ GET /jobs/0b14fe4f-3459-4fb6-a08c-e9300359befc 200 in 84ms
+ ○ Compiling /settings/api ...
+ ✓ Compiled /settings/api in 609ms (919 modules)
+ GET /settings/api 200 in 767ms
+ ✓ Compiled in 1654ms (933 modules)
+ GET /settings/api 200 in 142ms
+ ✓ Compiled in 359ms (933 modules)
+ GET /settings/api 200 in 93ms
+ ✓ Compiled in 320ms (933 modules)
+ GET /settings/api 200 in 61ms
+ ✓ Compiled in 372ms (933 modules)
+ GET /settings/api 200 in 66ms
+[?25h
