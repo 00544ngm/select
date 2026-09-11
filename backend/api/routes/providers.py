@@ -19,7 +19,8 @@ from backend.application.provider_service import (
     ProviderConfigurationError,
     ProviderService,
 )
-from backend.security.auth import require_admin
+from backend.db.models import User
+from backend.security.auth import get_current_user, require_admin
 
 
 def require_loopback(request: Request) -> None:
@@ -97,6 +98,7 @@ async def verify_provider_model(
     slug: ProviderSlug,
     request: ProviderModelVerifyRequest,
     service: ProviderService = Depends(get_provider_service),
+    user: User | None = Depends(get_current_user),
 ) -> ProviderModelVerifyResult:
     try:
         return await service.verify_model(
@@ -104,6 +106,7 @@ async def verify_provider_model(
             request.model,
             set_default=request.set_default,
             is_automatic=request.is_automatic,
+            acted_by=(user.username if user else None),
         )
     except (ProviderConfigurationError, ProviderConnectionError) as error:
         _raise_provider_error(error)
@@ -119,9 +122,15 @@ async def select_provider_model(
     model: str,
     request: ProviderModelSelectionRequest,
     service: ProviderService = Depends(get_provider_service),
+    user: User | None = Depends(get_current_user),
 ) -> ProviderModelSelectionResult:
     try:
-        return await service.set_model_selected(slug, model, request.is_selected)
+        return await service.set_model_selected(
+            slug,
+            model,
+            request.is_selected,
+            acted_by=(user.username if user else None),
+        )
     except (ProviderConfigurationError, ProviderConnectionError) as error:
         _raise_provider_error(error)
         raise AssertionError("unreachable")

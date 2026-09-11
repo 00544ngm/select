@@ -91,6 +91,8 @@ class ProviderConfigurationRepository:
         duration_ms: int | None = None,
         transport_mode: str | None = None,
         structured_output_mode: str | None = None,
+        acted_by: str | None = None,
+        acted_at: datetime | None = None,
     ) -> ProviderModelValidation:
         statement = select(ProviderModelValidation).where(
             ProviderModelValidation.provider_slug == provider_slug,
@@ -114,6 +116,10 @@ class ProviderConfigurationRepository:
         }
         if is_automatic:
             values["last_auto_tested_at"] = tested_at
+        if acted_by is not None:
+            values["last_acted_by"] = acted_by
+        if acted_at is not None:
+            values["last_acted_at"] = acted_at
         if record is None:
             record = ProviderModelValidation(
                 provider_slug=provider_slug,
@@ -235,6 +241,8 @@ class ProviderConfigurationRepository:
         api_protocol: str,
         model: str,
         is_selected: bool,
+        acted_by: str | None = None,
+        acted_at: datetime | None = None,
     ) -> ProviderModelValidation | None:
         statement = select(ProviderModelValidation).where(
             ProviderModelValidation.provider_slug == provider_slug,
@@ -246,6 +254,10 @@ class ProviderConfigurationRepository:
         if record is None:
             return None
         record.is_selected = is_selected
+        if acted_by is not None:
+            record.last_acted_by = acted_by
+        if acted_at is not None:
+            record.last_acted_at = acted_at
         await self._session.commit()
         await self._session.refresh(record)
         return record
@@ -428,6 +440,8 @@ class GroupProviderRepository:
         duration_ms: int | None = None,
         transport_mode: str | None = None,
         structured_output_mode: str | None = None,
+        acted_by: str | None = None,
+        acted_at: datetime | None = None,
     ) -> ApiGroupProviderModelValidation:
         provider = await self._resolve_provider(provider_slug)
         if provider is None:
@@ -455,6 +469,10 @@ class GroupProviderRepository:
         }
         if is_automatic:
             values["last_auto_tested_at"] = tested_at
+        if acted_by is not None:
+            values["last_acted_by"] = acted_by
+        if acted_at is not None:
+            values["last_acted_at"] = acted_at
         if record is None:
             record = ApiGroupProviderModelValidation(
                 api_group_id=self._api_group_id,
@@ -567,11 +585,17 @@ class GroupProviderRepository:
         api_protocol: str,
         model: str,
         is_selected: bool,
+        acted_by: str | None = None,
+        acted_at: datetime | None = None,
     ) -> ApiGroupProviderModelValidation | None:
         record = await self.get_model_validation(provider_slug, api_protocol, model)
         if record is None:
             return None
         record.is_selected = is_selected
+        if acted_by is not None:
+            record.last_acted_by = acted_by
+        if acted_at is not None:
+            record.last_acted_at = acted_at
         await self._session.commit()
         await self._session.refresh(record)
         return record

@@ -263,6 +263,7 @@ class ProviderService:
         *,
         set_default: bool = True,
         is_automatic: bool = False,
+        acted_by: str | None = None,
     ) -> ProviderModelVerifyResult:
         record = await self._repository.get(slug)
         if record is None or not record.encrypted_api_key:
@@ -309,6 +310,8 @@ class ProviderService:
             structured_output_mode=getattr(
                 probe, "structured_output_mode", None
             ),
+            acted_by=acted_by,
+            acted_at=(tested_at if acted_by else None),
         )
         is_default = model == record.default_model
         if probe.status == "verified" and set_default:
@@ -329,7 +332,12 @@ class ProviderService:
         )
 
     async def set_model_selected(
-        self, slug: str, model: str, is_selected: bool
+        self,
+        slug: str,
+        model: str,
+        is_selected: bool,
+        *,
+        acted_by: str | None = None,
     ) -> ProviderModelSelectionResult:
         record = await self._repository.get(slug)
         if record is None or not record.is_enabled:
@@ -356,7 +364,12 @@ class ProviderService:
                 message="只有当前连接验证成功的模型才能勾选使用",
             )
         updated = await self._repository.set_model_selected(
-            slug, record.api_protocol, model, is_selected
+            slug,
+            record.api_protocol,
+            model,
+            is_selected,
+            acted_by=acted_by,
+            acted_at=datetime.now(timezone.utc),
         )
         if updated is None:
             raise ProviderConfigurationError(
@@ -558,6 +571,16 @@ class ProviderService:
                     ),
                     last_auto_tested_at=(
                         getattr(validation, "last_auto_tested_at", None)
+                        if validation
+                        else None
+                    ),
+                    last_acted_by=(
+                        getattr(validation, "last_acted_by", None)
+                        if validation
+                        else None
+                    ),
+                    last_acted_at=(
+                        getattr(validation, "last_acted_at", None)
                         if validation
                         else None
                     ),

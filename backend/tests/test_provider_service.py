@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, ANY
 
 import pytest
 from pydantic import SecretStr
@@ -772,7 +772,7 @@ async def test_select_model_requires_fresh_verified_validation(tmp_path):
 
     assert result.is_selected is True
     repository.set_model_selected.assert_awaited_once_with(
-        "openai", "openai", "gpt-4o", True
+        "openai", "openai", "gpt-4o", True, acted_by=None, acted_at=ANY
     )
 
 

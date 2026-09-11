@@ -384,8 +384,12 @@ export default function ProviderSettingsPanel({
       test_message: null,
       error_code: null,
     }));
+  // Saved (persisted) options — verified / selected state — must always remain
+  // visible, including after a refresh that lands on a connection whose test
+  // signature we have not re-run yet. Only the *discovered-but-unverified*
+  // options are hidden until a fresh connection test.
   const catalogModelOptions = requiresRetest
-    ? []
+    ? savedModelOptions
     : [...savedModelOptions, ...discoveredModelOptions];
   const filteredModelOptions = filterAndSortModelCatalog(catalogModelOptions, {
     query: modelQuery,
@@ -635,6 +639,7 @@ export default function ProviderSettingsPanel({
                     )}
                     {option.tested_at && <p className="mt-1 text-xs text-muted-foreground">最近测试：{new Date(option.tested_at).toLocaleString("zh-CN")}</p>}
                     {option.last_used_at && <p className="mt-1 text-xs text-muted-foreground">最近使用：{new Date(option.last_used_at).toLocaleString("zh-CN")} · 共 {option.use_count ?? 0} 次</p>}
+                    {option.last_acted_at && <p className="mt-1 text-xs text-muted-foreground">最近操作：{new Date(option.last_acted_at).toLocaleString("zh-CN")}{option.last_acted_by ? ` · ${option.last_acted_by}` : ""}（验证/勾选）</p>}
                     <button
                       type="button"
                       disabled={verifyMutation.isPending || saveMutation.isPending || autoVerifyingModels.has(option.model)}

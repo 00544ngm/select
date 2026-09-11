@@ -422,6 +422,8 @@ export interface ProviderModelOption {
   last_used_at?: string | null;
   use_count?: number;
   last_auto_tested_at?: string | null;
+  last_acted_by?: string | null;
+  last_acted_at?: string | null;
   transport_mode?: OpenAITransportMode | null;
   structured_output_mode?: OpenAIStructuredOutputMode | null;
 }

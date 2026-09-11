@@ -53,6 +53,8 @@ class ProviderModelOption(BaseModel):
     last_used_at: datetime | None = None
     use_count: int = 0
     last_auto_tested_at: datetime | None = None
+    last_acted_by: str | None = None
+    last_acted_at: datetime | None = None
     transport_mode: Literal["chat_completions", "responses"] | None = None
     structured_output_mode: Literal[
         "json_schema", "json_object", "prompt_json"

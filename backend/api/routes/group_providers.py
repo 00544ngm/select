@@ -31,9 +31,10 @@ from backend.application.provider_service import (
     ProviderService,
 )
 from backend.db.auth_repository import ApiGroupRepository
+from backend.db.models import User
 from backend.db.provider_repository import GroupProviderRepository
 from backend.db.session import get_session
-from backend.security.auth import require_admin
+from backend.security.auth import get_current_user, require_admin
 
 router = APIRouter(
     prefix="/admin/api-groups/{group_id}/providers",
@@ -104,6 +105,7 @@ async def verify_group_provider_model(
     slug: ProviderSlug = Path(...),
     request: ProviderModelVerifyRequest = ...,
     service: ProviderService = Depends(get_group_provider_service),
+    user: User | None = Depends(get_current_user),
 ) -> ProviderModelVerifyResult:
     try:
         return await service.verify_model(
@@ -111,6 +113,7 @@ async def verify_group_provider_model(
             request.model,
             set_default=request.set_default,
             is_automatic=request.is_automatic,
+            acted_by=(user.username if user else None),
         )
     except (ProviderConfigurationError, ProviderConnectionError) as error:
         _raise_provider_error(error)
@@ -127,9 +130,15 @@ async def select_group_provider_model(
     model: str = Path(...),
     request: ProviderModelSelectionRequest = ...,
     service: ProviderService = Depends(get_group_provider_service),
+    user: User | None = Depends(get_current_user),
 ) -> ProviderModelSelectionResult:
     try:
-        return await service.set_model_selected(slug, model, request.is_selected)
+        return await service.set_model_selected(
+            slug,
+            model,
+            request.is_selected,
+            acted_by=(user.username if user else None),
+        )
     except (ProviderConfigurationError, ProviderConnectionError) as error:
         _raise_provider_error(error)
         raise AssertionError("unreachable")

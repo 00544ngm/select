@@ -251,6 +251,8 @@ class ProviderModelValidation(Base):
     duration_ms: Mapped[int | None] = mapped_column(Integer)
     transport_mode: Mapped[str | None] = mapped_column(String(24))
     structured_output_mode: Mapped[str | None] = mapped_column(String(24))
+    last_acted_by: Mapped[str | None] = mapped_column(String(64))
+    last_acted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class ApiGroupProvider(Base):
@@ -351,6 +353,8 @@ class ApiGroupProviderModelValidation(Base):
     duration_ms: Mapped[int | None] = mapped_column(Integer)
     transport_mode: Mapped[str | None] = mapped_column(String(24))
     structured_output_mode: Mapped[str | None] = mapped_column(String(24))
+    last_acted_by: Mapped[str | None] = mapped_column(String(64))
+    last_acted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class ApiGroup(Base):

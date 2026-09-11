@@ -9,7 +9,7 @@ from backend.api.dependencies import get_provider_service
 from backend.api.schemas.providers import ProviderModelVerifyResult, ProviderPublic
 from backend.application.provider_clients import ProviderConnectionTestResult
 from backend.main import create_app
-from backend.security.auth import require_admin
+from backend.security.auth import get_current_user, require_admin
 
 
 def public_provider() -> ProviderPublic:
@@ -37,6 +37,7 @@ async def test_provider_list_never_returns_secret():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
@@ -65,6 +66,8 @@ async def test_provider_list_never_returns_secret():
         "last_auto_tested_at": None,
         "transport_mode": None,
         "structured_output_mode": None,
+        "last_acted_by": None,
+        "last_acted_at": None,
     }
     assert "encrypted_api_key" not in response.text
     assert "sk-" not in response.text
@@ -81,6 +84,7 @@ async def test_provider_test_returns_discovered_models():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
@@ -107,6 +111,7 @@ async def test_provider_test_accepts_anthropic_protocol_for_cattoken_claude():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
@@ -134,6 +139,7 @@ async def test_provider_test_accepts_anthropic_protocol_for_custom_provider():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
@@ -158,6 +164,7 @@ async def test_provider_settings_reject_non_loopback_clients():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app, client=("203.0.113.8", 32000))
     async with AsyncClient(transport=transport, base_url="http://example.com") as client:
@@ -184,6 +191,7 @@ async def test_provider_model_verify_endpoint_returns_per_model_status():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
@@ -201,7 +209,7 @@ async def test_provider_model_verify_endpoint_returns_per_model_status():
     assert response.json()["transport_mode"] == "chat_completions"
     assert response.json()["structured_output_mode"] == "json_object"
     service.verify_model.assert_awaited_once_with(
-        "custom", "claude-opus-5", set_default=True, is_automatic=True
+        "custom", "claude-opus-5", set_default=True, is_automatic=True, acted_by=None
     )
 
 
@@ -216,6 +224,7 @@ async def test_provider_model_selection_endpoint_updates_single_model():
     app = create_app()
     app.dependency_overrides[get_provider_service] = lambda: service
     app.dependency_overrides[require_admin] = lambda: None
+    app.dependency_overrides[get_current_user] = lambda: None
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
@@ -226,4 +235,6 @@ async def test_provider_model_selection_endpoint_updates_single_model():
 
     assert response.status_code == 200
     assert response.json()["is_selected"] is True
-    service.set_model_selected.assert_awaited_once_with("openai", "gpt-4o", True)
+    service.set_model_selected.assert_awaited_once_with(
+        "openai", "gpt-4o", True, acted_by=None
+    )
