@@ -50,6 +50,7 @@ class Settings(BaseSettings):
 
     headless: bool = True
     browser_ws_endpoint: str | None = None
+    chrome_executable_path: str | None = None
     proxy: str | None = None
     captcha_wait_enabled: bool = True
     captcha_wait_timeout_seconds: int = 600

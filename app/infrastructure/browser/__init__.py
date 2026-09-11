@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 from playwright.async_api import (
@@ -21,14 +23,69 @@ from backend.desktop.browser_paths import resolve_browser_candidates
 
 CDP_PORT = 9222
 CDP_HOST = "127.0.0.1"
-CHROME_PATH = "C:/Program Files/Google/Chrome/Application/chrome.exe"
 CHROME_USER_DATA_DIR = Path.cwd() / ".chrome-profile"
+
+_CHROME_BINARY_NAMES = (
+    "google-chrome",
+    "google-chrome-stable",
+    "chromium",
+    "chromium-browser",
+    "chrome",
+)
+
+
+def _platform_chrome_candidates() -> list[str]:
+    """Default Chrome locations per platform (used when PATH lookup fails)."""
+    if sys.platform.startswith("win"):
+        return [
+            "C:/Program Files/Google/Chrome/Application/chrome.exe",
+            "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+        ]
+    if sys.platform == "darwin":
+        return ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
+    return [
+        "/usr/bin/google-chrome",
+        "/usr/bin/google-chrome-stable",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser",
+    ]
+
+
+def resolve_chrome_path() -> str:
+    """Resolve the Chrome/Chromium executable for this machine.
+
+    Order: explicit ``CHROME_EXECUTABLE_PATH`` setting/env > PATH lookup >
+    platform default. Resolved lazily so a Linux server without any Chrome
+    binary still boots (only scraping needs it), and so the deployed path can
+    be overridden without code changes.
+    """
+    override = (
+        getattr(settings, "chrome_executable_path", None)
+        or os.environ.get("CHROME_EXECUTABLE_PATH")
+        or ""
+    ).strip()
+    if override:
+        return override
+    for name in _CHROME_BINARY_NAMES:
+        found = shutil.which(name)
+        if found:
+            return found
+    candidates = _platform_chrome_candidates()
+    for candidate in candidates:
+        if Path(candidate).exists():
+            return candidate
+    return candidates[0]
+
+
+# Back-compat module constant (resolved at import; callers that must tolerate a
+# missing binary should use resolve_chrome_path()).
+CHROME_PATH = resolve_chrome_path()
 
 
 def build_chrome_launch_args(user_data_dir: str | Path | None = None) -> list[str]:
     profile_dir = str(user_data_dir) if user_data_dir else str(CHROME_USER_DATA_DIR)
     return [
-        CHROME_PATH,
+        resolve_chrome_path(),
         f"--remote-debugging-port={CDP_PORT}",
         f"--user-data-dir={profile_dir}",
         "--no-first-run",
@@ -133,8 +190,12 @@ class PlaywrightBrowserManager(BrowserManagerInterface):
     async def _start_cdp(self) -> None:
         """Launch local Chrome with CDP if not already running, then connect."""
         if not await self._check_cdp():
-            if not Path(CHROME_PATH).exists():
-                raise BrowserError(f"Chrome executable not found: {CHROME_PATH}")
+            chrome = resolve_chrome_path()
+            if not (Path(chrome).exists() or shutil.which(chrome)):
+                raise BrowserError(
+                    f"Chrome executable not found: {chrome}. Set CHROME_EXECUTABLE_PATH "
+                    "or start Chrome with --remote-debugging-port=9222 before running jobs."
+                )
             CHROME_USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
             self._chrome_process = subprocess.Popen(build_chrome_launch_args(), shell=False)
             self._owns_chrome_process = True
